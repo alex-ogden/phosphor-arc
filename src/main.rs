@@ -43,17 +43,17 @@ fn main() {
     let mut canvas = window.into_canvas().build().unwrap();
     let texture_creator = canvas.texture_creator();
 
-    // Internal 256x256 streaming texture matrix
+    // Internal streaming texture matrix
     let mut texture = texture_creator
-        .create_texture_streaming(PixelFormatEnum::ARGB8888, 256, 256)
+        .create_texture_streaming(PixelFormatEnum::ARGB8888, RES_HEIGHT, RES_WIDTH)
         .unwrap();
 
-    // VM buffer array
+    // VM buffer array (example before VPU is setup)
     let mut vm_framebuffer = [0u32; RES_HEIGHT * RES_WIDTH];
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     // Delay required to get 60 FPS
-    let frame_duration = Duration::from_nanos(1_000_000_000 / TARGET_FPS as u64);
+    let frame_duration = Duration::from_nanos(CLOCK_SPEED / TARGET_FPS as u64);
 
     'running: loop {
         let frame_start = Instant::now();
@@ -61,6 +61,7 @@ fn main() {
         // Event loop
         for event in event_pump.poll_iter() {
             match event {
+                // Quit event or escape
                 Event::Quit { .. }
                 | Event::KeyDown {
                     keycode: Some(Keycode::Escape),
@@ -79,10 +80,10 @@ fn main() {
             }
         }
 
-        // Run VM step batch
-        for pixel in vm_framebuffer.iter_mut() {
-            *pixel = 0x00FF0000;
-        } // Make screen red
+        // Run VM step batch here
+        
+        // Fill frame buffer with red for now
+        for pixel in vm_framebuffer.iter_mut() { *pixel = 0x00FF0000; }
 
         // Blit and present
         texture
