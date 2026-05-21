@@ -27,4 +27,10 @@ impl Cpu {
             debug_enabled:  *debug_enabled,
         }
     }
+    
+    pub fn step() -> u32 {
+        // Grab instruction from PC in memory
+        // Decode and execute instruction
+        // Return number of cycles
+    }
 }
