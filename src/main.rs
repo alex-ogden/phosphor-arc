@@ -6,6 +6,7 @@ use sdl2::pixels::PixelFormatEnum;
 use std::process;
 use std::time::{Duration, Instant};
 
+// Modules
 mod char_rom;
 mod cpu;
 mod memory;
@@ -13,15 +14,16 @@ mod vm;
 mod vpu;
 
 // Using a nice 4:3 aspect ratio
-const WINDOW_HEIGHT: usize          = 600;
-const WINDOW_WIDTH: usize           = 800;
-const RES_HEIGHT: usize             = 150;
-const RES_WIDTH: usize              = 200;
-const TARGET_FPS: usize             = 60;
-const CLOCK_SPEED: usize            = 10_000_000_000;
+const WINDOW_HEIGHT: usize          = 600; // SDL Window height
+const WINDOW_WIDTH: usize           = 800; // SDL Window width
+const RES_HEIGHT: usize             = 150; // Actual height resolution
+const RES_WIDTH: usize              = 200; // Actual width resolution
+const TARGET_FPS: usize             = 60;  // Target frame rate 
+const CLOCK_SPEED: usize            = 10_000_000_000; // 10MHz CPU Clock
 const INSTRUCTIONS_PER_FRAME: usize = CLOCK_SPEED / TARGET_FPS;
 
 fn main() {
+    // Setup SDL context and video subsystem
     let sdl_context = match sdl2::init() {
         Ok(context) => context,
         Err(e) => {
@@ -29,7 +31,6 @@ fn main() {
             process::exit(1);
         }
     };
-
     let video_subsystem = sdl_context.video().unwrap();
 
     // Setup window
@@ -47,6 +48,8 @@ fn main() {
     let mut texture = texture_creator
         .create_texture_streaming(PixelFormatEnum::ARGB8888, RES_HEIGHT, RES_WIDTH)
         .unwrap();
+
+    // Configure VM instance here
 
     // VM buffer array (example before VPU is setup)
     let mut vm_framebuffer = [0u32; RES_HEIGHT * RES_WIDTH];
