@@ -2,8 +2,8 @@
 
 ### Instructions:
 NOTES:
-    * For most of the 32-bit instructions, they are a "repeat" of the 16-bit version e.g rather than loading a value from a 16-bit address, then the address one after to load 16-bits into a register, it loads the value described above + another two addresses after as a 32-bit value into a reg pair
-    * Any instruction that "reads" from memory can have both a regular and R-appended version for reading from ROM
+* For most of the 32-bit instructions, they are a "repeat" of the 16-bit version e.g rather than loading a value from a 16-bit address, then the address one after to load 16-bits into a register, it loads the value described above + another two addresses after as a 32-bit value into a reg pair
+* Any instruction that "reads" from memory can have both a regular and R-appended version for reading from ROM
 
 Loads:
     * 16-bit reg-to-reg loads
