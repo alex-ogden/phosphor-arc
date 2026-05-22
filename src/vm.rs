@@ -1,7 +1,12 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
 use crate::cpu::Cpu;
-use crate::char_rom::CharacterRom;
-use crate::vpu::Vpu;
+
+const CYCLES_PER_FRAME: usize = 166_666;
+
+pub trait Bus {
+    fn read_word(&mut self, addr: u16) -> u16; // Reads two bytes from a memory location
+    fn write_word(&mut self, addr: u16, val: u16); // Writes two bytes to a memory location
+}
 
 pub struct PhosphorArc {
     pub cpu: Cpu,
@@ -9,47 +14,52 @@ pub struct PhosphorArc {
 }
 
 impl PhosphorArc {
-    pub fn new(debug_enabled: &bool) -> Self {
+    pub fn new() -> Self {
         Self {
-            cpu: Cpu::new(debug_enabled),
+            cpu: Cpu::new(),
             bus: PhosphorArcBus::new(),
         }
     }
-}
 
-// Bus trait for reading and writing to memory
-pub trait Bus {
-    fn read_word(&mut self, addr: u16) -> u8;
-    fn write_word(&mut self, addr: u16, val: u8);
-    fn read_char(&mut self, ascii_code: u8, row: u8) -> u8;
+    pub fn run_frame(&mut self) {
+        while self.bus.cycle_counter < CYCLES_PER_FRAME as u64 {
+            let cycles_consumed = self.cpu.step(&mut self.bus);
+            self.bus.cycle_counter += cycles_consumed;
+        }
+
+        // Reset frames before returning
+        self.bus.cycle_counter -= CYCLES_PER_FRAME as u64;
+    }
 }
 
 pub struct PhosphorArcBus {
-    pub ram:            Vec<u8>,        // System RAM
-    pub bios:           Vec<u8>,        // 4KB Read-only boot ROM
-    pub char_rom:       CharacterRom,   // 5440-byte character ROM
-    pub cycle_counter:  u64,            // CPU cycle counter
-    pub vpu:            Vpu,            // Video processing unit
+    pub mem: [u8; 0xFFFF],
+    pub cycle_counter: u64,
 }
 
 impl PhosphorArcBus {
     pub fn new() -> Self {
         Self {
-            ram:            vec![0; 65536],
-            bios:           vec![0; 4096],
-            char_rom:       CharacterRom::new(),
-            cycle_counter:  0,
-            vpu:            Vpu::new(),
+            mem: [0u8; 0xFFFF],
+            cycle_counter: 0,
         }
     }
 }
 
 impl Bus for PhosphorArcBus {
-    fn read_word(&mut self, addr: u16) -> u8 { todo!(); }
-    fn write_word(&mut self, addr: u16, val: u8) { todo!(); }
+    // Reads a 16-bit value from a starting address in memory
+    fn read_word(&mut self, addr: u16) -> u16 {
+        let lo = self.mem[addr as usize] as u16;
+        let hi = self.mem[(addr.wrapping_add(1)) as usize] as u16;
 
-    // Reads a character from character ROM
-    fn read_char(&mut self, ascii_code: u8, row: u8) -> u8 {
-        self.char_rom.read_row(ascii_code, row)
+        hi << 8 | lo
+    }
+
+    // Takes a 16-bit value and writes it to memory at starting address
+    fn write_word(&mut self, addr: u16, val: u16) {
+        let hi = (val >> 8) as u8;
+        let lo = val as u8;
+        self.mem[addr as usize] = lo;
+        self.mem[(addr.wrapping_add(1)) as usize] = hi;
     }
 }
