@@ -103,134 +103,117 @@ This gives us 256 unique opcodes
 Opcodes that take a 16 bit value (ADD ACC, nn) will need to fetch another byte from memory
 before computing the outcome (32-bit values will need two additional fetches instead of one).
 
-Opcode layout:
+### Opcode Matrix:
 
-LOAD:
-    // 16-bit loads
-    LOAD rr, rr => 0x01         - DONE
-    LOAD rr, nn => 0x02         - DONE
-    LOAD rr, (rr) => 0x03       - DONE
-    LOAD rr, (nn) => 0x04       - DONE
-    LOAD (rr), rr => 0x05       - DONE
-    LOAD (rr), nn => 0x06       - DONE
-    LOAD (rr), (rr) => 0x07
-    LOAD (rr), (nn) => 0x08
-    LOAD (nn), rr => 0x09
-    LOAD (nn), nn => 0x0A
-    LOAD (nn), (rr) => 0x0B
-    LOAD (nn), (nn) => 0x0C
-    LOAD acc, rr => 0x0D
-    LOAD acc, nn => 0x0E
-    LOAD acc, (rr) => 0x0F
-    LOAD acc, (nn) => 0x10
-    // 32-bit loads
-    LOAD rrrr, rrrr => 0x11
-    LOAD rrrr, nnnn => 0x12
-    LOAD rrrr, (rr) => 0x13
-    LOAD rrrr, (nn) => 0x14
-    LOAD (rr), rrrr => 0x15
-    LOAD (rr), nnnn => 0x16
-    LOAD (nn), rrrr => 0x17
-    LOAD (nn), nnnn => 0x18
-    LOAD (nn), (rr) => 0x19
-    LOAD (nn), (nn) => 0x1A
-    LOAD accp, rrrr => 0x1B
-    LOAD accp, nnnn => 0x1C
-    LOAD accp, (rr) => 0x1D
-    LOAD accp, (nn) => 0x1E
-    // 16-bit ROM loads
-    LOADR rr, (rr) => 0x1F
-    LOADR rr, (nn) => 0x20
-    LOADR acc, (rr) => 0x21
-    LOADR acc, (nn) => 0x22
-    // 32-bit ROM loads
-    LOADR rrrr, (rr) => 0x23
-    LOADR rrrr, (nn) => 0x24
-    LOADR accp, (rr) => 0x25
-    LOADR accp, (nn) => 0x26
-ADD:
-    // 16 bit ADD
-    ADD ACC, rr => 0x27
-    ADD ACC, nn => 0x28
-    ADD ACC, (rr) => 0x29
-    ADD ACC, (nn) => 0x2A
-    // 32 bit ADD
-    ADD ACCP, rrrr => 0x2B
-    ADD ACCP, nnnn => 0x2C
-    ADD ACCP, (rr) => 0x2D
-    ADD ACCP, (nn) => 0x2E
-    // 16-bit ROM ADD
-    ADDR ACC, (rr) => 0x2F
-    ADDR ACC, (nn) => 0x30
-    // 32-bit ROM ADD
-    ADDR ACCP, (rr) => 0x31
-    ADDR ACCP, (nn) => 0x32
-ADC:
-    // 16 bit ADC
-    ADC ACC, rr => 0x33
-    ADC ACC, nn => 0x34
-    ADC ACC, (rr) => 0x35
-    ADC ACC, (nn) => 0x36
-    // 32 bit ADC
-    ADC ACCP, rrrr => 0x37
-    ADC ACCP, nnnn => 0x38
-    ADC ACCP, (rr) => 0x39
-    ADC ACCP, (nn) => 0x3A
-    // 16-bit ROM ADC
-    ADCR ACC, (rr) => 0x3B
-    ADCR ACC, (nn) => 0x3C
-    // 32-bit ROM ADC
-    ADCR ACCP, (rr) => 0x3D
-    ADCR ACCP, (nn) => 0x3E
-SUB:
-    // 16 bit SUB
-    SUB ACC, rr => 0x3F
-    SUB ACC, nn => 0x40
-    SUB ACC, (rr) => 0x41
-    SUB ACC, (nn) => 0x42
-    // 32 bit SUB
-    SUB ACCP, rrrr => 0x43
-    SUB ACCP, nnnn => 0x44
-    SUB ACCP, (rr) => 0x45
-    SUB ACCP, (nn) => 0x46
-    // 16-bit ROM SUB
-    SUBR ACC, (rr) => 0x47
-    SUBR ACC, (nn) => 0x48
-    // 32-bit ROM SUB
-    SUBR ACCP, (rr) => 0x49
-    SUBR ACCP, (nn) => 0x4A
-SBC:
-    // 16 bit SBC
-    SBC ACC, rr => 0x4B
-    SBC ACC, nn => 0x4C
-    SBC ACC, (rr) => 0x4D
-    SBC ACC, (nn) => 0x4E
-    // 32 bit SBC
-    SBC ACCP, rrrr => 0x4F
-    SBC ACCP, nnnn => 0x50
-    SBC ACCP, (rr) => 0x51
-    SBC ACCP, (nn) => 0x52
-    // 16-bit ROM SBC
-    SBCR ACC, (rr) => 0x53
-    SBCR ACC, (nn) => 0x54
-    // 32-bit ROM SBC
-    SBCR ACCP, (rr) => 0x55
-    SBCR ACCP, (nn) => 0x56
-INC:
-    // 16 bit increment
-    INC rr => 0x57
-    INC (rr) => 0x58
-    INC (nn) => 0x59
-    // 32 bit increment
-    INCP rrrr => 0x5A
-    INCP (rr) => 0x5B
-    INCP (nn) => 0x5C
-DEC:
-    // 16-bit decrement
-    DEC rr => 0x5D
-    DEC (rr) => 0x5E
-    DEC (nn) => 0x5F
-    // 32 bit decrement
-    DECP rrrr => 0x60
-    DECP (rr) => 0x61
-    DECP (nn) => 0x62
+##### LOAD:
+* LOAD rr, rr => 0x01         - DONE
+* LOAD rr, nn => 0x02         - DONE
+* LOAD rr, (rr) => 0x03       - DONE
+* LOAD rr, (nn) => 0x04       - DONE
+* LOAD (rr), rr => 0x05       - DONE
+* LOAD (rr), nn => 0x06       - DONE
+* LOAD (rr), (rr) => 0x07
+* LOAD (rr), (nn) => 0x08
+* LOAD (nn), rr => 0x09
+* LOAD (nn), nn => 0x0A
+* LOAD (nn), (rr) => 0x0B
+* LOAD (nn), (nn) => 0x0C
+* LOAD acc, rr => 0x0D
+* LOAD acc, nn => 0x0E
+* LOAD acc, (rr) => 0x0F
+* LOAD acc, (nn) => 0x10
+* LOAD rrrr, rrrr => 0x11
+* LOAD rrrr, nnnn => 0x12
+* LOAD rrrr, (rr) => 0x13
+* LOAD rrrr, (nn) => 0x14
+* LOAD (rr), rrrr => 0x15
+* LOAD (rr), nnnn => 0x16
+* LOAD (nn), rrrr => 0x17
+* LOAD (nn), nnnn => 0x18
+* LOAD (nn), (rr) => 0x19
+* LOAD (nn), (nn) => 0x1A
+* LOAD accp, rrrr => 0x1B
+* LOAD accp, nnnn => 0x1C
+* LOAD accp, (rr) => 0x1D
+* LOAD accp, (nn) => 0x1E
+* LOADR rr, (rr) => 0x1F
+* LOADR rr, (nn) => 0x20
+* LOADR acc, (rr) => 0x21
+* LOADR acc, (nn) => 0x22
+* LOADR rrrr, (rr) => 0x23
+* LOADR rrrr, (nn) => 0x24
+* LOADR accp, (rr) => 0x25
+* LOADR accp, (nn) => 0x26
+
+##### ADD:
+* ADD ACC, rr => 0x27
+* ADD ACC, nn => 0x28
+* ADD ACC, (rr) => 0x29
+* ADD ACC, (nn) => 0x2A
+* ADD ACCP, rrrr => 0x2B
+* ADD ACCP, nnnn => 0x2C
+* ADD ACCP, (rr) => 0x2D
+* ADD ACCP, (nn) => 0x2E
+* ADDR ACC, (rr) => 0x2F
+* ADDR ACC, (nn) => 0x30
+* ADDR ACCP, (rr) => 0x31
+* ADDR ACCP, (nn) => 0x32
+
+##### ADC:
+* ADC ACC, rr => 0x33
+* ADC ACC, nn => 0x34
+* ADC ACC, (rr) => 0x35
+* ADC ACC, (nn) => 0x36
+* ADC ACCP, rrrr => 0x37
+* ADC ACCP, nnnn => 0x38
+* ADC ACCP, (rr) => 0x39
+* ADC ACCP, (nn) => 0x3A
+* ADCR ACC, (rr) => 0x3B
+* ADCR ACC, (nn) => 0x3C
+* ADCR ACCP, (rr) => 0x3D
+* ADCR ACCP, (nn) => 0x3E
+
+##### SUB:
+* SUB ACC, rr => 0x3F
+* SUB ACC, nn => 0x40
+* SUB ACC, (rr) => 0x41
+* SUB ACC, (nn) => 0x42
+* SUB ACCP, rrrr => 0x43
+* SUB ACCP, nnnn => 0x44
+* SUB ACCP, (rr) => 0x45
+* SUB ACCP, (nn) => 0x46
+* SUBR ACC, (rr) => 0x47
+* SUBR ACC, (nn) => 0x48
+* SUBR ACCP, (rr) => 0x49
+* SUBR ACCP, (nn) => 0x4A
+
+##### SBC:
+* SBC ACC, rr => 0x4B
+* SBC ACC, nn => 0x4C
+* SBC ACC, (rr) => 0x4D
+* SBC ACC, (nn) => 0x4E
+* SBC ACCP, rrrr => 0x4F
+* SBC ACCP, nnnn => 0x50
+* SBC ACCP, (rr) => 0x51
+* SBC ACCP, (nn) => 0x52
+* SBCR ACC, (rr) => 0x53
+* SBCR ACC, (nn) => 0x54
+* SBCR ACCP, (rr) => 0x55
+* SBCR ACCP, (nn) => 0x56
+
+##### INC:
+* INC rr => 0x57
+* INC (rr) => 0x58
+* INC (nn) => 0x59
+* INCP rrrr => 0x5A
+* INCP (rr) => 0x5B
+* INCP (nn) => 0x5C
+
+##### DEC:
+* DEC rr => 0x5D
+* DEC (rr) => 0x5E
+* DEC (nn) => 0x5F
+* DECP rrrr => 0x60
+* DECP (rr) => 0x61
+* DECP (nn) => 0x62
+
