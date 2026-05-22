@@ -108,12 +108,12 @@ Opcode layout:
 
 LOAD:
     // 16-bit loads
-    LOAD rr, rr => 0x01
-    LOAD rr, nn => 0x02
-    LOAD rr, (rr) => 0x03
-    LOAD rr, (nn) => 0x04
-    LOAD (rr), rr => 0x05
-    LOAD (rr), nn => 0x06
+    LOAD rr, rr => 0x01         - DONE
+    LOAD rr, nn => 0x02         - DONE
+    LOAD rr, (rr) => 0x03       - DONE
+    LOAD rr, (nn) => 0x04       - DONE
+    LOAD (rr), rr => 0x05       - DONE
+    LOAD (rr), nn => 0x06       - DONE
     LOAD (rr), (rr) => 0x07
     LOAD (rr), (nn) => 0x08
     LOAD (nn), rr => 0x09
@@ -135,103 +135,103 @@ LOAD:
     LOAD (nn), nnnn => 0x18
     LOAD (nn), (rr) => 0x19
     LOAD (nn), (nn) => 0x1A
-    LOAD accp, rrrr => 0x1D
-    LOAD accp, nnnn => 0x1E
-    LOAD accp, (rr) => 0x1F
-    LOAD accp, (nn) => 0x20
+    LOAD accp, rrrr => 0x1B
+    LOAD accp, nnnn => 0x1C
+    LOAD accp, (rr) => 0x1D
+    LOAD accp, (nn) => 0x1E
     // 16-bit ROM loads
-    LOADR rr, (rr) => 0x21
-    LOADR rr, (nn) => 0x22
-    LOADR acc, (rr) => 0x23
-    LOADR acc, (nn) => 0x24
+    LOADR rr, (rr) => 0x1F
+    LOADR rr, (nn) => 0x20
+    LOADR acc, (rr) => 0x21
+    LOADR acc, (nn) => 0x22
     // 32-bit ROM loads
-    LOADR rrrr, (rr) => 0x25
-    LOADR rrrr, (nn) => 0x26
-    LOADR accp, (rr) => 0x27
-    LOADR accp, (nn) => 0x28
+    LOADR rrrr, (rr) => 0x23
+    LOADR rrrr, (nn) => 0x24
+    LOADR accp, (rr) => 0x25
+    LOADR accp, (nn) => 0x26
 ADD:
     // 16 bit ADD
-    ADD ACC, rr => 0x29
-    ADD ACC, nn => 0x2A
-    ADD ACC, (rr) => 0x2B
-    ADD ACC, (nn) => 0x2C
+    ADD ACC, rr => 0x27
+    ADD ACC, nn => 0x28
+    ADD ACC, (rr) => 0x29
+    ADD ACC, (nn) => 0x2A
     // 32 bit ADD
-    ADD ACCP, rrrr => 0x2D
-    ADD ACCP, nnnn => 0x2E
-    ADD ACCP, (rr) => 0x2F
-    ADD ACCP, (nn) => 0x30
+    ADD ACCP, rrrr => 0x2B
+    ADD ACCP, nnnn => 0x2C
+    ADD ACCP, (rr) => 0x2D
+    ADD ACCP, (nn) => 0x2E
     // 16-bit ROM ADD
-    ADDR ACC, (rr) => 0x31
-    ADDR ACC, (nn) => 0x32
+    ADDR ACC, (rr) => 0x2F
+    ADDR ACC, (nn) => 0x30
     // 32-bit ROM ADD
-    ADDR ACCP, (rr) => 0x33
-    ADDR ACCP, (nn) => 0x34
+    ADDR ACCP, (rr) => 0x31
+    ADDR ACCP, (nn) => 0x32
 ADC:
     // 16 bit ADC
-    ADC ACC, rr => 0x35
-    ADC ACC, nn => 0x36
-    ADC ACC, (rr) => 0x37
-    ADC ACC, (nn) => 0x38
+    ADC ACC, rr => 0x33
+    ADC ACC, nn => 0x34
+    ADC ACC, (rr) => 0x35
+    ADC ACC, (nn) => 0x36
     // 32 bit ADC
-    ADC ACCP, rrrr => 0x39
-    ADC ACCP, nnnn => 0x3A
-    ADC ACCP, (rr) => 0x3B
-    ADC ACCP, (nn) => 0x3C
+    ADC ACCP, rrrr => 0x37
+    ADC ACCP, nnnn => 0x38
+    ADC ACCP, (rr) => 0x39
+    ADC ACCP, (nn) => 0x3A
     // 16-bit ROM ADC
-    ADCR ACC, (rr) => 0x3D
-    ADCR ACC, (nn) => 0x3E
+    ADCR ACC, (rr) => 0x3B
+    ADCR ACC, (nn) => 0x3C
     // 32-bit ROM ADC
-    ADCR ACCP, (rr) => 0x3F
-    ADCR ACCP, (nn) => 0x40
+    ADCR ACCP, (rr) => 0x3D
+    ADCR ACCP, (nn) => 0x3E
 SUB:
     // 16 bit SUB
-    SUB ACC, rr => 0x41
-    SUB ACC, nn => 0x42
-    SUB ACC, (rr) => 0x43
-    SUB ACC, (nn) => 0x44
+    SUB ACC, rr => 0x3F
+    SUB ACC, nn => 0x40
+    SUB ACC, (rr) => 0x41
+    SUB ACC, (nn) => 0x42
     // 32 bit SUB
-    SUB ACCP, rrrr => 0x45
-    SUB ACCP, nnnn => 0x46
-    SUB ACCP, (rr) => 0x47
-    SUB ACCP, (nn) => 0x48
+    SUB ACCP, rrrr => 0x43
+    SUB ACCP, nnnn => 0x44
+    SUB ACCP, (rr) => 0x45
+    SUB ACCP, (nn) => 0x46
     // 16-bit ROM SUB
-    SUBR ACC, (rr) => 0x49
-    SUBR ACC, (nn) => 0x4A
+    SUBR ACC, (rr) => 0x47
+    SUBR ACC, (nn) => 0x48
     // 32-bit ROM SUB
-    SUBR ACCP, (rr) => 0x4B
-    SUBR ACCP, (nn) => 0x4C
+    SUBR ACCP, (rr) => 0x49
+    SUBR ACCP, (nn) => 0x4A
 SBC:
     // 16 bit SBC
-    SBC ACC, rr => 0x4D
-    SBC ACC, nn => 0x4E
-    SBC ACC, (rr) => 0x4F
-    SBC ACC, (nn) => 0x50
+    SBC ACC, rr => 0x4B
+    SBC ACC, nn => 0x4C
+    SBC ACC, (rr) => 0x4D
+    SBC ACC, (nn) => 0x4E
     // 32 bit SBC
-    SBC ACCP, rrrr => 0x51
-    SBC ACCP, nnnn => 0x52
-    SBC ACCP, (rr) => 0x53
-    SBC ACCP, (nn) => 0x54
+    SBC ACCP, rrrr => 0x4F
+    SBC ACCP, nnnn => 0x50
+    SBC ACCP, (rr) => 0x51
+    SBC ACCP, (nn) => 0x52
     // 16-bit ROM SBC
-    SBCR ACC, (rr) => 0x55
-    SBCR ACC, (nn) => 0x56
+    SBCR ACC, (rr) => 0x53
+    SBCR ACC, (nn) => 0x54
     // 32-bit ROM SBC
-    SBCR ACCP, (rr) => 0x57
-    SBCR ACCP, (nn) => 0x58
+    SBCR ACCP, (rr) => 0x55
+    SBCR ACCP, (nn) => 0x56
 INC:
     // 16 bit increment
-    INC rr => 0x59
-    INC (rr) => 0x5A
-    INC (nn) => 0x5B
+    INC rr => 0x57
+    INC (rr) => 0x58
+    INC (nn) => 0x59
     // 32 bit increment
-    INCP rrrr => 0x5C
-    INCP (rr) => 0x5D
-    INCP (nn) => 0x5E
+    INCP rrrr => 0x5A
+    INCP (rr) => 0x5B
+    INCP (nn) => 0x5C
 DEC:
     // 16-bit decrement
-    DEC rr => 0x5F
-    DEC (rr) => 0x60
-    DEC (nn) => 0x61
+    DEC rr => 0x5D
+    DEC (rr) => 0x5E
+    DEC (nn) => 0x5F
     // 32 bit decrement
-    DECP rrrr => 0x62
-    DECP (rr) => 0x63
-    DECP (nn) => 0x64
+    DECP rrrr => 0x60
+    DECP (rr) => 0x61
+    DECP (nn) => 0x62

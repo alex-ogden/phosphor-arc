@@ -63,7 +63,9 @@ impl Arc16Cpu {
     }
 
     pub fn step(&mut self, bus: &mut impl Bus) -> u64 {
-        let instr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let instr = bus.read_rom_word(self.pc);
+        self.pc = self.pc.wrapping_add(2);
+        bus.tick(1);
         self.decode_and_execute(instr, bus)
     }
 
