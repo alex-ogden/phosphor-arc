@@ -6,97 +6,96 @@ NOTES:
 * Any instruction that "reads" from memory can have both a regular and R-appended version for reading from ROM
 
 Loads:
-    * 16-bit reg-to-reg loads
-    * 16-bit immediate-to-reg loads
-    * 16-bit indirect reg address loads (rr)
-    * 16-bit indirect val address loads (nn)
-    * 32-bit reg-to-reg loads (reg pairs)
-    * 32-bit immediate-to-reg loads (reg pair)
-    * 32-bit indirect reg address loads (rr)
-    * 32-bit indirect val address loads (nn)
+* 16-bit reg-to-reg loads
+* 16-bit immediate-to-reg loads
+* 16-bit indirect reg address loads (rr)
+* 16-bit indirect val address loads (nn)
+* 32-bit reg-to-reg loads (reg pairs)
+* 32-bit immediate-to-reg loads (reg pair)
+* 32-bit indirect reg address loads (rr)
+* 32-bit indirect val address loads (nn)
 
 Add:
-    * Add 16 bit reg to acc
-    * Add 16 bit immediate to acc
-    * Add 16-bit indirect val at reg address (rr)
-    * Add 16-bit indirect val at given address (nn)
-    * Add 32 bit reg pair to acc pair
-    * Add 32 bit immediate to acc pair
-    * Add 32 bit val from reg location to acc
-    * Add 32-bit indirect val at reg address (rr)
-    * Add 32-bit indirect val at given address (nn)
+* Add 16 bit reg to acc
+* Add 16 bit immediate to acc
+* Add 16-bit indirect val at reg address (rr)
+* Add 16-bit indirect val at given address (nn)
+* Add 32 bit reg pair to acc pair
+* Add 32 bit immediate to acc pair
+* Add 32 bit val from reg location to acc
+* Add 32-bit indirect val at reg address (rr)
+* Add 32-bit indirect val at given address (nn)
 
 Sub:
-    * Sub 16 bit reg from acc
-    * Sub 16 bit immediate from acc
-    * Sub 16-bit indirect val at reg address (rr)
-    * Sub 16-bit indirect val at given address (nn)
-    * Sub 32 bit reg pair from acc pair
-    * Sub 32 bit immediate from acc pair
-    * Sub 32-bit indirect val at reg address (rr)
-    * Sub 32-bit indirect val at given address (nn)
+* Sub 16 bit reg from acc
+* Sub 16 bit immediate from acc
+* Sub 16-bit indirect val at reg address (rr)
+* Sub 16-bit indirect val at given address (nn)
+* Sub 32 bit reg pair from acc pair
+* Sub 32 bit immediate from acc pair
+* Sub 32-bit indirect val at reg address (rr)
+* Sub 32-bit indirect val at given address (nn)
 
 Adc:
-    * Adc 16 bit reg to acc
-    * Adc 16 bit immediate to acc
-    * Adc 16-bit indirect val at reg address (rr)
-    * Adc 16-bit indirect val at given address (nn)
-    * Adc 32 bit reg pair to acc pair
-    * Adc 32 bit immediate to acc pair
-    * Adc 32 bit val from reg location to acc
-    * Adc 32-bit indirect val at reg address (rr)
-    * Adc 32-bit indirect val at given address (nn)
+* Adc 16 bit reg to acc
+* Adc 16 bit immediate to acc
+* Adc 16-bit indirect val at reg address (rr)
+* Adc 16-bit indirect val at given address (nn)
+* Adc 32 bit reg pair to acc pair
+* Adc 32 bit immediate to acc pair
+* Adc 32 bit val from reg location to acc
+* Adc 32-bit indirect val at reg address (rr)
+* Adc 32-bit indirect val at given address (nn)
 
 Sbc:
-    * Sbc 16 bit reg from acc
-    * Sbc 16 bit immediate from acc
-    * Sbc 16-bit indirect val at reg address (rr)
-    * Sbc 16-bit indirect val at given address (nn)
-    * Sbc 32 bit reg pair from acc pair
-    * Sbc 32 bit immediate from acc pair
-    * Sbc 32-bit indirect val at reg address (rr)
-    * Sbc 32-bit indirect val at given address (nn)
+* Sbc 16 bit reg from acc
+* Sbc 16 bit immediate from acc
+* Sbc 16-bit indirect val at reg address (rr)
+* Sbc 16-bit indirect val at given address (nn)
+* Sbc 32 bit reg pair from acc pair
+* Sbc 32 bit immediate from acc pair
+* Sbc 32-bit indirect val at reg address (rr)
+* Sbc 32-bit indirect val at given address (nn)
 
 Call:
-    * Call unconditional (PC + 1 (if already incremented) pushed to stack & loaded with 16 bit val)
-    * Call conditional (PC + 1 (if already incremented) pushed to stack & loaded with 16 bit val)
+* Call unconditional (PC + 1 (if already incremented) pushed to stack & loaded with 16 bit val)
+* Call conditional (PC + 1 (if already incremented) pushed to stack & loaded with 16 bit val)
+
 Ret:
-    * Ret unconditional (pop top stack 16 bit val into PC)
-    * Ret conditional (pop top stack 16 bit val into PC)
+* Ret unconditional (pop top stack 16 bit val into PC)
+* Ret conditional (pop top stack 16 bit val into PC)
 
 Jump:
-    * Unconditional jump to 16-bit address
-    * Conditional jump to 16-bit address
-    * relative jumps not needed (?)
+* Unconditional jump to 16-bit address
+* Conditional jump to 16-bit address
+* relative jumps not needed (?)
 
 Inc/Dec:
-    * Inc/Dec register
-    * Inc/Dec register pair
-    * Inc/Dec val at indirect register (rr)
-    * Inc/Dec val at indirect address (nn)
+* Inc/Dec register
+* Inc/Dec register pair
+* Inc/Dec val at indirect register (rr)
+* Inc/Dec val at indirect address (nn)
 
 And/Or/Xor/Cp:
-    * 16-bit reg
-    * val at indirect register (rr)
-    * val at indirect address (nn)
+* 16-bit reg
+* val at indirect register (rr)
+* val at indirect address (nn)
 
 DAA:
-    * Decimal-adjustment of acc reg
-    * Decimal-adjustment of acc reg pair
+* Decimal-adjustment of acc reg
+* Decimal-adjustment of acc reg pair
 
 PUSH/POP:
-    * Push and Pop 16-bit values from the stack (into/out of registers)
-    * Push and Pop 32-bit values from the stack (into/out of reg pairs)
+* Push and Pop 16-bit values from the stack (into/out of registers)
+* Push and Pop 32-bit values from the stack (into/out of reg pairs)
 
 ### Opcode breakdown:
 
-```
 ```
 Bit:    15 14 13 12 11 10  9  8 │  7  6  5  4 │  3  2  1  0
 Field: +───────────────────────+│+───────────+│+───────────+
        │     OPCODE (8 bits)   │││ DST (Reg) │││ SRC (Reg) │
        +───────────────────────┘│+───────────+|+───────────+
-```
 ```
 
 This gives us 256 unique opcodes
