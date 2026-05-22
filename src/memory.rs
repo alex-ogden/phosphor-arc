@@ -3,14 +3,14 @@ use anyhow::{anyhow, Result};
 
 pub struct Memory {
     pub ram: [u8; 0xFFFF],  // 64KB RAM
-    pub rom: [u8; 0x1000],  // 4KB ROM
+    pub rom: [u8; 0x4000],  // 16KB ROM
 }
 
 impl Memory {
     pub fn new() -> Self {
         Self {
             ram: [0u8; 0xFFFF],
-            rom: [0u8; 0x1000],
+            rom: [0u8; 0x4000],
         }
     }
 

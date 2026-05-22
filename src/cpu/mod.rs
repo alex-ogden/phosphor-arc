@@ -11,7 +11,7 @@ pub mod flags {
     pub const FLAG_C: u8    = 0x08;     // Bit 3 - Carry
 }
 
-pub struct Cpu {
+pub struct Arc16Cpu {
     // Special registers
     pub pc:             u16,        // Program Counter
     pub sp:             u16,        // Stack Pointer
@@ -37,7 +37,7 @@ pub struct Cpu {
     pub debug_enabled:  bool,       // Is debug mode enabled?
 }
 
-impl Cpu {
+impl Arc16Cpu {
     pub fn new() -> Self {
         Self {
             pc:             0x0000,
@@ -63,7 +63,7 @@ impl Cpu {
     }
 
     pub fn step(&mut self, bus: &mut impl Bus) -> u64 {
-        let instr = bus.read_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let instr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         self.decode_and_execute(instr, bus)
     }
 
@@ -89,4 +89,7 @@ impl Cpu {
     fn set_r23(&mut self, val: u32) { self.r2 = (val >> 16) as u16; self.r3 = val as u16; }
     fn set_r45(&mut self, val: u32) { self.r4 = (val >> 16) as u16; self.r5 = val as u16; }
     fn set_r67(&mut self, val: u32) { self.r6 = (val >> 16) as u16; self.r7 = val as u16; }
+
+    fn get_acc_pair(&self) -> u32 { (self.acc as u32) << 16 | self.acc2 as u32 }
+    fn set_acc_pair(&mut self, val: u32) { self.acc = (val >> 16) as u16; self.acc2 = val as u16; }
 }
