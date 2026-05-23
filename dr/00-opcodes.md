@@ -106,24 +106,24 @@ before computing the outcome (32-bit values will need two additional fetches ins
 ### Opcode Matrix:
 
 ##### LOAD:
-* LOAD rr, rr => 0x01         - DONE
-* LOAD rr, nn => 0x02         - DONE
-* LOAD rr, (rr) => 0x03       - DONE
-* LOAD rr, (nn) => 0x04       - DONE
-* LOAD (rr), rr => 0x05       - DONE
-* LOAD (rr), nn => 0x06       - DONE
-* LOAD (rr), (rr) => 0x07
-* LOAD (rr), (nn) => 0x08
-* LOAD (nn), rr => 0x09
-* LOAD (nn), nn => 0x0A
-* LOAD (nn), (rr) => 0x0B
-* LOAD (nn), (nn) => 0x0C
-* LOAD acc, rr => 0x0D
-* LOAD acc, nn => 0x0E
-* LOAD acc, (rr) => 0x0F
-* LOAD acc, (nn) => 0x10
-* LOAD rrrr, rrrr => 0x11
-* LOAD rrrr, nnnn => 0x12
+* LOAD rr, rr => 0x01           - DONE
+* LOAD rr, nn => 0x02           - DONE
+* LOAD rr, (rr) => 0x03         - DONE
+* LOAD rr, (nn) => 0x04         - DONE
+* LOAD (rr), rr => 0x05         - DONE
+* LOAD (rr), nn => 0x06         - DONE
+* LOAD (rr), (rr) => 0x07       - DONE
+* LOAD (rr), (nn) => 0x08       - DONE
+* LOAD (nn), rr => 0x09         - DONE
+* LOAD (nn), nn => 0x0A         - DONE
+* LOAD (nn), (rr) => 0x0B       - DONE
+* LOAD (nn), (nn) => 0x0C       - DONE
+* LOAD acc, rr => 0x0D          - DONE
+* LOAD acc, nn => 0x0E          - DONE
+* LOAD acc, (rr) => 0x0F        - DONE
+* LOAD acc, (nn) => 0x10        - DONE
+* LOAD rrrr, rrrr => 0x11       - DONE
+* LOAD rrrr, nnnn => 0x12       - DONE
 * LOAD rrrr, (rr) => 0x13
 * LOAD rrrr, (nn) => 0x14
 * LOAD (rr), rrrr => 0x15
