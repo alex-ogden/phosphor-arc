@@ -805,37 +805,335 @@ impl Arc16Cpu {
         self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) > 0xFFFFFFFF);
     }
     
-    fn addr_acc_rr_ind() {}
+    fn addr_acc_rr_ind(&mut self, src:u8, bus: &mut impl Bus) {
+        let acc = self.acc;
+        
+        let src_val = match src {
+            0x01 => bus.read_rom_word(self.r0),
+            0x02 => bus.read_rom_word(self.r1),
+            0x03 => bus.read_rom_word(self.r2),
+            0x04 => bus.read_rom_word(self.r3),
+            0x05 => bus.read_rom_word(self.r4),
+            0x06 => bus.read_rom_word(self.r5),
+            0x07 => bus.read_rom_word(self.r6),
+            0x08 => bus.read_rom_word(self.r7),
+            _ => unreachable!(),
+        };
+
+        let result = self.acc.wrapping_add(src_val);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) > 0xFFFF);
+    }
     
-    fn addr_acc_nn_ind() {}
+    fn addr_acc_nn_ind(&mut self, bus: &mut impl Bus) {
+        let acc = self.acc;
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let src_val = bus.read_rom_word(src_addr);
+
+        let result = self.acc.wrapping_add(src_val);
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) > 0xFFFF);
+    }
     
-    fn addr_accp_rr_ind() {}
+    fn addr_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let src_addr = match src {
+            0x01 => self.r0,
+            0x02 => self.r1,
+            0x03 => self.r2,
+            0x04 => self.r3,
+            0x05 => self.r4,
+            0x06 => self.r5,
+            0x07 => self.r6,
+            0x08 => self.r7,
+            _ => unreachable!(),
+        };
+        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+
+        let result = self.get_acc_pair().wrapping_add(src_val);
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) > 0xFFFFFFFF);
+    }
     
-    fn addr_accp_nn_ind() {}
+    fn addr_accp_nn_ind(&mut self, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+
+        let result = self.get_acc_pair().wrapping_add(src_val);
+        self.set_acc_pair(result);
+        
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) > 0xFFFFFFFF);
+    }
     
-    fn adc_acc_rr() {}
+    fn adc_acc_rr(&mut self, src: u8) {
+        let acc = self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_val = match src {
+            0x01 => self.r0,
+            0x02 => self.r1,
+            0x03 => self.r2,
+            0x04 => self.r3,
+            0x05 => self.r4,
+            0x06 => self.r5,
+            0x07 => self.r6,
+            0x08 => self.r7,
+            _ => unreachable!(),
+        };
+
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adc_acc_nn() {}
+    fn adc_acc_nn(&mut self, bus: &mut impl Bus) {
+        let acc = self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_val = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adc_acc_rr_ind() {}
+    fn adc_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        let acc = self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_val = match src {
+            0x01 => bus.read_ram_word(self.r0),
+            0x02 => bus.read_ram_word(self.r1),
+            0x03 => bus.read_ram_word(self.r2),
+            0x04 => bus.read_ram_word(self.r3),
+            0x05 => bus.read_ram_word(self.r4),
+            0x06 => bus.read_ram_word(self.r5),
+            0x07 => bus.read_ram_word(self.r6),
+            0x08 => bus.read_ram_word(self.r7),
+            _ => unreachable!(),
+        };
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adc_acc_nn_ind() {}
+    fn adc_acc_nn_ind(&mut self, bus: &mut impl Bus) {
+        let acc = self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let src_val = bus.read_ram_word(src_addr);
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xF) + (src_val & 0xF) > 0xF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adc_accp_rrrr() {}
+    fn adc_accp_rrrr(&mut self, src: u8) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_val = match src {
+            0x00 => self.get_r01(),
+            0x02 => self.get_r23(),
+            0x04 => self.get_r45(),
+            0x06 => self.get_r67(),
+            _ => unreachable!(),
+        };
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
-    fn adc_accp_nnnn() {}
+    fn adc_accp_nnnn(&mut self, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_lo = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let src_hi = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
-    fn adc_accp_rr_ind() {}
+    fn adc_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = match src {
+            0x01 => self.r0,
+            0x02 => self.r1,
+            0x03 => self.r2,
+            0x04 => self.r3,
+            0x05 => self.r4,
+            0x06 => self.r5,
+            0x07 => self.r6,
+            0x08 => self.r7,
+            _ => unreachable!(),
+        };
+        let (src_lo, src_hi) = (bus.read_ram_word(src_addr), bus.read_ram_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
-    fn adc_accp_nn_ind() {}
+    fn adc_accp_nn_ind(&mut self, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let (src_lo, src_hi) = (bus.read_ram_word(src_addr), bus.read_ram_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
-    fn adcr_acc_rr_ind() {}
+    fn adcr_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        let acc= self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_val = match src {
+            0x01 => bus.read_rom_word(self.r0),
+            0x02 => bus.read_rom_word(self.r1),
+            0x03 => bus.read_rom_word(self.r2),
+            0x04 => bus.read_rom_word(self.r3),
+            0x05 => bus.read_rom_word(self.r4),
+            0x06 => bus.read_rom_word(self.r5),
+            0x07 => bus.read_rom_word(self.r6),
+            0x08 => bus.read_rom_word(self.r7),
+            _ => unreachable!(),
+        };
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xFF) + (src_val & 0xFF) > 0xFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adcr_acc_nn_ind() {}
+    fn adcr_acc_nn_ind(&mut self, bus: &mut impl Bus) {
+        let acc = self.acc;
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let src_val = bus.read_rom_word(src_addr);
+        let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
+
+        self.acc = result;
+
+        self.set_flag(FLAG_S, result & 0x8000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (acc & 0xFF) + (src_val & 0xFF) > 0xFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (acc as u32) + (src_val as u32) + (carry as u32) > 0xFFFF);
+    }
     
-    fn adcr_accp_rr_ind() {}
+    fn adcr_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = match src {
+            0x01 => self.r0,
+            0x02 => self.r1,
+            0x03 => self.r2,
+            0x04 => self.r3,
+            0x05 => self.r4,
+            0x06 => self.r5,
+            0x07 => self.r6,
+            0x08 => self.r7,
+            _ => unreachable!(),
+        };
+        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
-    fn adcr_accp_nn_ind() {}
+    fn adcr_accp_nn_ind(&mut self, bus: &mut impl Bus) {
+        let accp = self.get_acc_pair();
+        let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
+        let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let src_val = (src_hi as u32) << 16 | src_lo as u32;
+        let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
+
+        self.set_acc_pair(result);
+
+        self.set_flag(FLAG_S, result & 0x80000000 != 0);
+        self.set_flag(FLAG_Z, result == 0);
+        self.set_flag(FLAG_H, (accp & 0xFFFF) + (src_val & 0xFFFF) > 0xFFFF);
+        self.set_flag(FLAG_N, false);
+        self.set_flag(FLAG_C, (accp as u64) + (src_val as u64) + (carry as u64) > 0xFFFFFFFF);
+    }
     
     fn sub_acc_rr() {}
     

@@ -154,24 +154,24 @@ before computing the outcome (32-bit values will need two additional fetches ins
 * ADD ACCP, nnnn => 0x2C        - DONE
 * ADD ACCP, (rr) => 0x2D        - DONE
 * ADD ACCP, (nn) => 0x2E        - DONE
-* ADDR ACC, (rr) => 0x2F
-* ADDR ACC, (nn) => 0x30
-* ADDR ACCP, (rr) => 0x31
-* ADDR ACCP, (nn) => 0x32
+* ADDR ACC, (rr) => 0x2F        - DONE
+* ADDR ACC, (nn) => 0x30        - DONE
+* ADDR ACCP, (rr) => 0x31       - DONE
+* ADDR ACCP, (nn) => 0x32       - DONE
 
 ##### ADC:
-* ADC ACC, rr => 0x33
-* ADC ACC, nn => 0x34
-* ADC ACC, (rr) => 0x35
-* ADC ACC, (nn) => 0x36
-* ADC ACCP, rrrr => 0x37
-* ADC ACCP, nnnn => 0x38
-* ADC ACCP, (rr) => 0x39
-* ADC ACCP, (nn) => 0x3A
-* ADCR ACC, (rr) => 0x3B
-* ADCR ACC, (nn) => 0x3C
-* ADCR ACCP, (rr) => 0x3D
-* ADCR ACCP, (nn) => 0x3E
+* ADC ACC, rr => 0x33           - DONE
+* ADC ACC, nn => 0x34           - DONE
+* ADC ACC, (rr) => 0x35         - DONE
+* ADC ACC, (nn) => 0x36         - DONE
+* ADC ACCP, rrrr => 0x37        - DONE
+* ADC ACCP, nnnn => 0x38        - DONE
+* ADC ACCP, (rr) => 0x39        - DONE
+* ADC ACCP, (nn) => 0x3A        - DONE
+* ADCR ACC, (rr) => 0x3B        - DONE
+* ADCR ACC, (nn) => 0x3C        - DONE
+* ADCR ACCP, (rr) => 0x3D       - DONE
+* ADCR ACCP, (nn) => 0x3E       - DONE
 
 ##### SUB:
 * SUB ACC, rr => 0x3F
