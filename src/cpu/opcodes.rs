@@ -73,6 +73,18 @@ impl Arc16Cpu {
             0x3C => self.adcr_acc_nn_ind(bus),
             0x3D => self.adcr_accp_rr_ind(src, bus),
             0x3E => self.adcr_accp_nn_ind(bus),
+
+            /* ... */
+
+            0x57 => self.inc_rr(dest),
+            0x58 => self.inc_rr_ind(dest, bus),
+            0x59 => self.inc_nn_ind(dest, bus),
+
+            /* ... */
+
+            0x5D => self.dec_rr(dest),
+            0x5E => self.dec_rr_ind(dest, bus),
+            0x5F => self.dec_nn_ind(dest, bus),
             _ => {
                 if self.debug_enabled {
                     eprintln!("Unimplemented instruction: {:04X} (opcode: {:02X})", instr, opcode);
@@ -772,11 +784,24 @@ impl Arc16Cpu {
     
     fn sbcr_accp_nn_ind() {}
     
-    fn inc_rr() {}
+    fn inc_rr(&mut self, dest: u8) {
+        if dest >= 8 { unreachable!(); }
+        self.r[dest as usize] = self.r[dest as usize].wrapping_add(1);
+    }
     
-    fn inc_rr_ind() {}
+    fn inc_rr_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
+        let addr = self.r[dest as usize];
+        let val = bus.read_ram_word(addr);
+        bus.write_ram_word(addr, val.wrapping_add(1));
+    }
     
-    fn inc_nn_ind() {}
+    fn inc_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
+        let addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let val = bus.read_ram_word(addr);
+        bus.write_ram_word(addr, val.wrapping_add(1));
+    }
     
     fn incp_rrrr() {}
     
@@ -784,12 +809,25 @@ impl Arc16Cpu {
     
     fn incp_nn_ind() {}
     
-    fn dec_rr() {}
+    fn dec_rr(&mut self, dest: u8) {
+        if dest >= 8 { unreachable!(); }
+        self.r[dest as usize] = self.r[dest as usize].wrapping_sub(1);
+    }
     
-    fn dec_rr_ind() {}
+    fn dec_rr_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
+        let addr = self.r[dest as usize];
+        let val = bus.read_ram_word(addr);
+        bus.write_ram_word(addr, val.wrapping_sub(1));
+    }
     
-    fn dec_nn_ind() {}
-    
+    fn dec_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
+        let addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
+        let val = bus.read_ram_word(addr);
+        bus.write_ram_word(addr, val.wrapping_sub(1));
+    }
+
     fn decp_rrrr() {}
     
     fn decp_rr_ind() {}
