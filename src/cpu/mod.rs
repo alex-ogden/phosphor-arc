@@ -22,6 +22,7 @@ pub struct Arc16Cpu {
     pub flag:           u8,         // Flag register (only lower byte used currently)
 
     // General-purpose registers
+    pub r:              [u16; 8],
     pub r0:             u16,
     pub r1:             u16,
     pub r2:             u16,
@@ -47,6 +48,7 @@ impl Arc16Cpu {
             acc2:           0x0000,
             flag:           0x00,
 
+            r:              [0; 8],
             r0:             0x0000,
             r1:             0x0000,
             r2:             0x0000,
@@ -62,7 +64,7 @@ impl Arc16Cpu {
         }
     }
 
-    pub fn step(&mut self, bus: &mut impl Bus) -> u64 {
+    pub fn step(&mut self, bus: &mut impl Bus) {
         let instr = bus.read_rom_word(self.pc);
         self.pc = self.pc.wrapping_add(2);
         bus.tick(1);
@@ -81,17 +83,9 @@ impl Arc16Cpu {
         }
     }
 
-    // 32-bit register pair helper functions
-    fn get_r01(&self) -> u32 { (self.r0 as u32) << 16 | self.r1 as u32 }
-    fn get_r23(&self) -> u32 { (self.r2 as u32) << 16 | self.r3 as u32 }
-    fn get_r45(&self) -> u32 { (self.r4 as u32) << 16 | self.r5 as u32 }
-    fn get_r67(&self) -> u32 { (self.r6 as u32) << 16 | self.r7 as u32 }
-
-    fn set_r01(&mut self, val: u32) { self.r0 = (val >> 16) as u16; self.r1 = val as u16; }
-    fn set_r23(&mut self, val: u32) { self.r2 = (val >> 16) as u16; self.r3 = val as u16; }
-    fn set_r45(&mut self, val: u32) { self.r4 = (val >> 16) as u16; self.r5 = val as u16; }
-    fn set_r67(&mut self, val: u32) { self.r6 = (val >> 16) as u16; self.r7 = val as u16; }
-
     fn get_acc_pair(&self) -> u32 { (self.acc as u32) << 16 | self.acc2 as u32 }
     fn set_acc_pair(&mut self, val: u32) { self.acc = (val >> 16) as u16; self.acc2 = val as u16; }
+
+    fn get_r_pair(&self, index: usize) -> u32 { (self.r[index] as u32) << 16 | self.r[index + 1] as u32 }
+    fn set_r_pair(&mut self, index: usize, val: u32) { self.r[index] = (val >> 16) as u16; self.r[index + 1] = val as u16; }
 }

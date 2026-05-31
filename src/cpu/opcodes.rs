@@ -57,6 +57,22 @@ impl Arc16Cpu {
             0x2C => self.add_accp_nnnn(bus),
             0x2D => self.add_accp_rr_ind(src, bus),
             0x2E => self.add_accp_nn_ind(bus),
+            0x2F => self.addr_acc_rr_ind(src, bus),
+            0x30 => self.addr_acc_nn_ind(bus),
+            0x31 => self.addr_accp_rr_ind(src, bus),
+            0x32 => self.addr_accp_nn_ind(bus),
+            0x33 => self.adc_acc_rr(src),
+            0x34 => self.adc_acc_nn(bus),
+            0x35 => self.adc_acc_rr_ind(src, bus),
+            0x36 => self.adc_acc_nn_ind(bus),
+            0x37 => self.adc_accp_rrrr(src),
+            0x38 => self.adc_accp_nnnn(bus),
+            0x39 => self.adc_accp_rr_ind(src, bus),
+            0x3A => self.adc_accp_nn_ind(bus),
+            0x3B => self.adcr_acc_rr_ind(src, bus),
+            0x3C => self.adcr_acc_nn_ind(bus),
+            0x3D => self.adcr_accp_rr_ind(src, bus),
+            0x3E => self.adcr_accp_nn_ind(bus),
             _ => {
                 if self.debug_enabled {
                     eprintln!("Unimplemented instruction: {:04X} (opcode: {:02X})", instr, opcode);
@@ -66,214 +82,72 @@ impl Arc16Cpu {
     }
 
     fn load_rr_rr(&mut self, dest: u8, src: u8) {
-        let src_val = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_val = self.r[src as usize];
+        self.r[dest as usize] = src_val;
     }
 
     fn load_rr_nn(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_val = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        self.r[dest as usize] = src_val;
     }
 
     fn load_rr_rr_ind(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_val = bus.read_ram_word(self.r[src as usize]);
+        self.r[dest as usize] = src_val;
     }
 
     fn load_rr_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_ram_word(src_addr);
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        self.r[dest as usize] = src_val;
     }
 
     fn load_rr_ind_rr(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_val = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-
-        let dest_addr = match dest {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_val = self.r[src as usize];
+        let dest_addr = self.r[dest as usize];
         bus.write_ram_word(dest_addr, src_val);
     }
 
     fn load_rr_ind_nn(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_val = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-
-        match dest {
-            0x01 => bus.write_ram_word(self.r0, src_val),
-            0x02 => bus.write_ram_word(self.r1, src_val),
-            0x03 => bus.write_ram_word(self.r2, src_val),
-            0x04 => bus.write_ram_word(self.r3, src_val),
-            0x05 => bus.write_ram_word(self.r4, src_val),
-            0x06 => bus.write_ram_word(self.r5, src_val),
-            0x07 => bus.write_ram_word(self.r6, src_val),
-            0x08 => bus.write_ram_word(self.r7, src_val),
-            _ => unreachable!(),
-        }
+        bus.write_ram_word(self.r[dest as usize], src_val);
     }
 
     fn load_rr_ind_rr_ind(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
-
-        match dest {
-            0x01 => bus.write_ram_word(self.r0, src_val),
-            0x02 => bus.write_ram_word(self.r1, src_val),
-            0x03 => bus.write_ram_word(self.r2, src_val),
-            0x04 => bus.write_ram_word(self.r3, src_val),
-            0x05 => bus.write_ram_word(self.r4, src_val),
-            0x06 => bus.write_ram_word(self.r5, src_val),
-            0x07 => bus.write_ram_word(self.r6, src_val),
-            0x08 => bus.write_ram_word(self.r7, src_val),
-            _ => unreachable!(),
-        }
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_val = bus.read_ram_word(self.r[src as usize]);
+        bus.write_ram_word(self.r[dest as usize], src_val);
     }
 
     fn load_rr_ind_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_ram_word(src_addr);
-
-        match dest {
-            0x01 => bus.write_ram_word(self.r0, src_val),
-            0x02 => bus.write_ram_word(self.r1, src_val),
-            0x03 => bus.write_ram_word(self.r2, src_val),
-            0x04 => bus.write_ram_word(self.r3, src_val),
-            0x05 => bus.write_ram_word(self.r4, src_val),
-            0x06 => bus.write_ram_word(self.r5, src_val),
-            0x07 => bus.write_ram_word(self.r6, src_val),
-            0x08 => bus.write_ram_word(self.r7, src_val),
-            _ => unreachable!(),
-        }
+        bus.write_ram_word(self.r[dest as usize], src_val);
     }
 
     fn load_nn_ind_rr(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let dest_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-
-        match src {
-            0x01 => bus.write_ram_word(dest_addr, self.r0),
-            0x02 => bus.write_ram_word(dest_addr, self.r1),
-            0x03 => bus.write_ram_word(dest_addr, self.r2),
-            0x04 => bus.write_ram_word(dest_addr, self.r3),
-            0x05 => bus.write_ram_word(dest_addr, self.r4),
-            0x06 => bus.write_ram_word(dest_addr, self.r5),
-            0x07 => bus.write_ram_word(dest_addr, self.r6),
-            0x08 => bus.write_ram_word(dest_addr, self.r7),
-            _ => unreachable!(),
-        }
+        bus.write_ram_word(dest_addr, self.r[src as usize]);
     }
 
     fn load_nn_ind_nn(&mut self, bus: &mut impl Bus) {
         let dest_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-
         bus.write_ram_word(dest_addr, src_val);
     }
     
     fn load_nn_ind_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let dest_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
-
+        let src_val = bus.read_ram_word(self.r[src as usize]);
         bus.write_ram_word(dest_addr, src_val);
     }
     
@@ -281,22 +155,12 @@ impl Arc16Cpu {
         let dest_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_ram_word(src_addr);
-
         bus.write_ram_word(dest_addr, src_val);
     }
     
     fn load_acc_rr(&mut self, src: u8) {
-        match src {
-            0x01 => self.acc = self.r0,
-            0x02 => self.acc = self.r1,
-            0x03 => self.acc = self.r2,
-            0x04 => self.acc = self.r3,
-            0x05 => self.acc = self.r4,
-            0x06 => self.acc = self.r5,
-            0x07 => self.acc = self.r6,
-            0x08 => self.acc = self.r7,
-            _ => unreachable!(),
-        }
+        if src >= 8 { unreachable!(); }
+        self.acc = self.r[src as usize];
     }
     
     fn load_acc_nn(&mut self, bus: &mut impl Bus) {
@@ -305,139 +169,68 @@ impl Arc16Cpu {
     }
     
     fn load_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
-
+        if src >= 8 { unreachable!(); }
+        let src_val = bus.read_ram_word(self.r[src as usize]);
         self.acc = src_val;
     }
     
     fn load_acc_nn_ind(&mut self, bus: &mut impl Bus) {
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_ram_word(src_addr);
-
         self.acc = src_val;
     }
     
     fn load_rrrr_rrrr(&mut self, dest: u8, src: u8) {
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
-
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        let src_even = (src & 0x06) as usize;
+        let dest_even = (dest & 0x06) as usize;
+        self.r[dest_even] = self.r[src_even];
+        self.r[dest_even + 1] = self.r[src_even + 1];
     }
     
     fn load_rrrr_nnnn(&mut self, dest: u8, bus: &mut impl Bus) {
         let src_lo = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_hi = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-        let src_val = (src_hi as u32) << 16 | src_lo as u32;
-
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        let dest_even = (dest & 0x06) as usize;
+        self.r[dest_even] = src_lo;
+        self.r[dest_even + 1] = src_hi;
     }
     
     fn load_rrrr_rr_ind(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let (src_lo, src_hi) = match src {
-            0x01 => (bus.read_ram_word(self.r0), bus.read_ram_word(self.r0.wrapping_add(2))),
-            0x02 => (bus.read_ram_word(self.r1), bus.read_ram_word(self.r1.wrapping_add(2))),
-            0x03 => (bus.read_ram_word(self.r2), bus.read_ram_word(self.r2.wrapping_add(2))),
-            0x04 => (bus.read_ram_word(self.r3), bus.read_ram_word(self.r3.wrapping_add(2))),
-            0x05 => (bus.read_ram_word(self.r4), bus.read_ram_word(self.r4.wrapping_add(2))),
-            0x06 => (bus.read_ram_word(self.r5), bus.read_ram_word(self.r5.wrapping_add(2))),
-            0x07 => (bus.read_ram_word(self.r6), bus.read_ram_word(self.r6.wrapping_add(2))),
-            0x08 => (bus.read_ram_word(self.r7), bus.read_ram_word(self.r7.wrapping_add(2))),
-            _ => unreachable!(),
-        };
-        let src_val = (src_hi as u32) << 16 | src_lo as u32;
-
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let ram_ptr = self.r[src as usize];
+        let src_lo = bus.read_ram_word(ram_ptr);
+        let src_hi = bus.read_ram_word(ram_ptr.wrapping_add(2));
+        let dest_even = (dest & 0x06) as usize;
+        self.r[dest_even] = src_lo;
+        self.r[dest_even + 1] = src_hi;
     }
     
     fn load_rrrr_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-        let (src_lo, src_hi) = (bus.read_ram_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
-        let src_val = (src_hi as u32) << 16 | src_lo as u32;
-        
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        let src_lo = bus.read_ram_word(src_addr);
+        let src_hi = bus.read_ram_word(src_addr.wrapping_add(2));
+        let dest_even = (dest & 0x06) as usize;
+        self.r[dest_even] = src_lo;
+        self.r[dest_even + 1] = src_hi;
     }
     
     fn load_rr_ind_rrrr(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
-
-        let (src_hi, src_lo) = ((src_val >> 16) as u16, src_val as u16);
-
-        let dest_addr = match dest {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_even = (src & 0x06) as usize;
+        let src_lo = self.r[src_even];
+        let src_hi = self.r[src_even + 1];
+        let dest_addr = self.r[dest as usize];
         bus.write_ram_word(dest_addr, src_lo);
         bus.write_ram_word(dest_addr.wrapping_add(2), src_hi);
     }
     
     fn load_rr_ind_nnnn(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_lo = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_hi = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
 
-        let dest_addr = match dest {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
+        let dest_addr = self.r[dest as usize];
 
         bus.write_ram_word(dest_addr, src_lo);
         bus.write_ram_word(dest_addr.wrapping_add(2), src_hi);
@@ -445,17 +238,10 @@ impl Arc16Cpu {
     
     fn load_nn_ind_rrrr(&mut self, src: u8, bus: &mut impl Bus) {
         let dest_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
-        let (src_hi, src_lo) = ((src_val >> 16) as u16, src_val as u16);
-        
-        bus.write_ram_word(dest_addr, src_lo);
-        bus.write_ram_word(dest_addr.wrapping_add(2), src_hi);
+        let src_even = (src & 0x06) as usize;
+        let src_val = self.get_r_pair(src_even);
+        bus.write_ram_word(dest_addr, src_val as u16);
+        bus.write_ram_word(dest_addr.wrapping_add(2), (src_val >> 16) as u16);
     }
     
     fn load_nn_ind_nnnn(&mut self, bus: &mut impl Bus) {
@@ -468,15 +254,8 @@ impl Arc16Cpu {
     }
     
     fn load_accp_rrrr(&mut self, src: u8) {
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
-
-        self.set_acc_pair(src_val);
+        let src_even = (src & 0x06) as usize;
+        self.set_acc_pair(self.get_r_pair(src_even));
     }
     
     fn load_accp_nnnn(&mut self, bus: &mut impl Bus) {
@@ -488,17 +267,8 @@ impl Arc16Cpu {
     }
     
     fn load_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
-        let (src_lo, src_hi) = match src {
-            0x01 => (bus.read_ram_word(self.r0), bus.read_ram_word(self.r0.wrapping_add(2))),
-            0x02 => (bus.read_ram_word(self.r1), bus.read_ram_word(self.r1.wrapping_add(2))),
-            0x03 => (bus.read_ram_word(self.r2), bus.read_ram_word(self.r2.wrapping_add(2))),
-            0x04 => (bus.read_ram_word(self.r3), bus.read_ram_word(self.r3.wrapping_add(2))),
-            0x05 => (bus.read_ram_word(self.r4), bus.read_ram_word(self.r4.wrapping_add(2))),
-            0x06 => (bus.read_ram_word(self.r5), bus.read_ram_word(self.r5.wrapping_add(2))),
-            0x07 => (bus.read_ram_word(self.r6), bus.read_ram_word(self.r6.wrapping_add(2))),
-            0x08 => (bus.read_ram_word(self.r7), bus.read_ram_word(self.r7.wrapping_add(2))),
-            _ => unreachable!(),
-        };
+        if src >= 8 { unreachable!(); }
+        let (src_lo, src_hi) = (bus.read_ram_word(self.r[src as usize]), bus.read_ram_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
         self.set_acc_pair(src_val);
@@ -513,62 +283,21 @@ impl Arc16Cpu {
     }
     
     fn loadr_rr_rr_ind(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let src_val = bus.read_rom_word(src_addr);
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        if src >= 8 || dest >= 8 { unreachable!(); }
+        let src_val = bus.read_rom_word(self.r[src as usize]);
+        self.r[dest as usize] = src_val;
     }
     
     fn loadr_rr_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
+        if dest >= 8 { unreachable!(); }
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_rom_word(src_addr);
-
-        match dest {
-            0x01 => self.r0 = src_val,
-            0x02 => self.r1 = src_val,
-            0x03 => self.r2 = src_val,
-            0x04 => self.r3 = src_val,
-            0x05 => self.r4 = src_val,
-            0x06 => self.r5 = src_val,
-            0x07 => self.r6 = src_val,
-            0x08 => self.r7 = src_val,
-            _ => unreachable!(),
-        }
+        self.r[dest as usize] = src_val;
     }
     
     fn loadr_acc_rr_ind(&mut self, dest: u8, bus: &mut impl Bus) {
-        let src_val = match dest {
-            0x01 => bus.read_rom_word(self.r0),
-            0x02 => bus.read_rom_word(self.r1),
-            0x03 => bus.read_rom_word(self.r2),
-            0x04 => bus.read_rom_word(self.r3),
-            0x05 => bus.read_rom_word(self.r4),
-            0x06 => bus.read_rom_word(self.r5),
-            0x07 => bus.read_rom_word(self.r6),
-            0x08 => bus.read_rom_word(self.r7),
-            _ => unreachable!(),
-        };
-        
+        if dest >= 8 { unreachable!(); }
+        let src_val = bus.read_rom_word(self.r[dest as usize]);
         self.acc = src_val;
     }
     
@@ -579,27 +308,11 @@ impl Arc16Cpu {
     }
     
     fn loadr_rrrr_rr_ind(&mut self, dest: u8, src: u8, bus: &mut impl Bus) {
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        if src >= 8 { unreachable!(); }
+        let (src_lo, src_hi) = (bus.read_rom_word(self.r[src as usize]), bus.read_rom_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        self.set_r_pair((dest & 0x06) as usize, src_val);
     }
     
     fn loadr_rrrr_nn_ind(&mut self, dest: u8, bus: &mut impl Bus) {
@@ -607,28 +320,12 @@ impl Arc16Cpu {
         let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
-        match dest {
-            0x00 => self.set_r01(src_val),
-            0x02 => self.set_r23(src_val),
-            0x04 => self.set_r45(src_val),
-            0x06 => self.set_r67(src_val),
-            _ => unreachable!(),
-        }
+        self.set_r_pair((dest & 0x06) as usize, src_val);
     }
     
     fn loadr_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        if src >= 8 { unreachable!(); }
+        let (src_lo, src_hi) = (bus.read_rom_word(self.r[src as usize]), bus.read_rom_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
         self.set_acc_pair(src_val);
@@ -643,18 +340,9 @@ impl Arc16Cpu {
     }
     
     fn add_acc_rr(&mut self, src: u8) {
+        if src >= 8 { unreachable!(); }
         let acc = self.acc;
-        let src_val = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(), 
-        };
+        let src_val = self.r[src as usize];
 
         let result = self.acc.wrapping_add(src_val);
 
@@ -682,18 +370,9 @@ impl Arc16Cpu {
     }
     
     fn add_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let acc = self.acc;
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
+        let src_val = bus.read_ram_word(self.r[src as usize]);
 
         let result = self.acc.wrapping_add(src_val);
         
@@ -712,7 +391,7 @@ impl Arc16Cpu {
         let src_addr = bus.read_rom_word(self.pc); self.pc = self.pc.wrapping_add(2);
         let src_val = bus.read_ram_word(src_addr);
 
-        let result = self.acc.wrapping_add(2);
+        let result = self.acc.wrapping_add(src_val);
 
         self.acc = result;
 
@@ -725,15 +404,9 @@ impl Arc16Cpu {
     
     fn add_accp_rrrr(&mut self, src: u8) {
         let accp = self.get_acc_pair();
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
-
-        let result = self.get_acc_pair().wrapping_add(accp);
+        let src_even = (src & 0x06) as usize;
+        let src_val = self.get_r_pair(src_even);
+        let result = accp.wrapping_add(src_val);
 
         self.set_acc_pair(result);
 
@@ -762,19 +435,9 @@ impl Arc16Cpu {
     }
     
     fn add_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let accp = self.get_acc_pair();
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_ram_word(src_addr), bus.read_ram_word(src_addr.wrapping_add(2)));
+        let (src_lo, src_hi) = (bus.read_ram_word(self.r[src as usize]), bus.read_ram_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
         let result = self.get_acc_pair().wrapping_add(src_val);
@@ -806,19 +469,9 @@ impl Arc16Cpu {
     }
     
     fn addr_acc_rr_ind(&mut self, src:u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let acc = self.acc;
-        
-        let src_val = match src {
-            0x01 => bus.read_rom_word(self.r0),
-            0x02 => bus.read_rom_word(self.r1),
-            0x03 => bus.read_rom_word(self.r2),
-            0x04 => bus.read_rom_word(self.r3),
-            0x05 => bus.read_rom_word(self.r4),
-            0x06 => bus.read_rom_word(self.r5),
-            0x07 => bus.read_rom_word(self.r6),
-            0x08 => bus.read_rom_word(self.r7),
-            _ => unreachable!(),
-        };
+        let src_val = bus.read_rom_word(self.r[src as usize]);
 
         let result = self.acc.wrapping_add(src_val);
 
@@ -847,19 +500,9 @@ impl Arc16Cpu {
     }
     
     fn addr_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let accp = self.get_acc_pair();
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let (src_lo, src_hi) = (bus.read_rom_word(self.r[src as usize]), bus.read_rom_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
 
         let result = self.get_acc_pair().wrapping_add(src_val);
@@ -891,18 +534,7 @@ impl Arc16Cpu {
     fn adc_acc_rr(&mut self, src: u8) {
         let acc = self.acc;
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_val = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-
+        let src_val = if src < 8 { self.r[src as usize] } else { unreachable!() };
         let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
 
         self.set_flag(FLAG_S, result & 0x8000 != 0);
@@ -930,17 +562,8 @@ impl Arc16Cpu {
     fn adc_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
         let acc = self.acc;
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_val = match src {
-            0x01 => bus.read_ram_word(self.r0),
-            0x02 => bus.read_ram_word(self.r1),
-            0x03 => bus.read_ram_word(self.r2),
-            0x04 => bus.read_ram_word(self.r3),
-            0x05 => bus.read_ram_word(self.r4),
-            0x06 => bus.read_ram_word(self.r5),
-            0x07 => bus.read_ram_word(self.r6),
-            0x08 => bus.read_ram_word(self.r7),
-            _ => unreachable!(),
-        };
+        if src >= 8 { unreachable!(); }
+        let src_val = bus.read_ram_word(self.r[src as usize]);
         let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
 
         self.acc = result;
@@ -971,13 +594,8 @@ impl Arc16Cpu {
     fn adc_accp_rrrr(&mut self, src: u8) {
         let accp = self.get_acc_pair();
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_val = match src {
-            0x00 => self.get_r01(),
-            0x02 => self.get_r23(),
-            0x04 => self.get_r45(),
-            0x06 => self.get_r67(),
-            _ => unreachable!(),
-        };
+        let src_even = (src & 0x06) as usize;
+        let src_val = self.get_r_pair(src_even);
         let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
 
         self.set_acc_pair(result);
@@ -1007,20 +625,10 @@ impl Arc16Cpu {
     }
     
     fn adc_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let accp = self.get_acc_pair();
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_ram_word(src_addr), bus.read_ram_word(src_addr.wrapping_add(2)));
+        let (src_lo, src_hi) = (bus.read_ram_word(self.r[src as usize]), bus.read_ram_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
         let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
 
@@ -1051,19 +659,10 @@ impl Arc16Cpu {
     }
     
     fn adcr_acc_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
-        let acc= self.acc;
+        if src >= 8 { unreachable!(); }
+        let acc = self.acc;
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_val = match src {
-            0x01 => bus.read_rom_word(self.r0),
-            0x02 => bus.read_rom_word(self.r1),
-            0x03 => bus.read_rom_word(self.r2),
-            0x04 => bus.read_rom_word(self.r3),
-            0x05 => bus.read_rom_word(self.r4),
-            0x06 => bus.read_rom_word(self.r5),
-            0x07 => bus.read_rom_word(self.r6),
-            0x08 => bus.read_rom_word(self.r7),
-            _ => unreachable!(),
-        };
+        let src_val = bus.read_rom_word(self.r[src as usize]);
         let result = self.acc.wrapping_add(src_val).wrapping_add(carry);
 
         self.acc = result;
@@ -1092,20 +691,10 @@ impl Arc16Cpu {
     }
     
     fn adcr_accp_rr_ind(&mut self, src: u8, bus: &mut impl Bus) {
+        if src >= 8 { unreachable!(); }
         let accp = self.get_acc_pair();
         let carry = if self.get_flag(FLAG_C) { 1 } else { 0 };
-        let src_addr = match src {
-            0x01 => self.r0,
-            0x02 => self.r1,
-            0x03 => self.r2,
-            0x04 => self.r3,
-            0x05 => self.r4,
-            0x06 => self.r5,
-            0x07 => self.r6,
-            0x08 => self.r7,
-            _ => unreachable!(),
-        };
-        let (src_lo, src_hi) = (bus.read_rom_word(src_addr), bus.read_rom_word(src_addr.wrapping_add(2)));
+        let (src_lo, src_hi) = (bus.read_rom_word(self.r[src as usize]), bus.read_rom_word(self.r[src as usize].wrapping_add(2)));
         let src_val = (src_hi as u32) << 16 | src_lo as u32;
         let result = self.get_acc_pair().wrapping_add(src_val).wrapping_add(carry);
 
