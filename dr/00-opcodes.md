@@ -202,17 +202,17 @@ before computing the outcome (32-bit values will need two additional fetches ins
 * SBCR ACCP, (nn) => 0x56
 
 ##### INC:
-* INC rr => 0x57
-* INC (rr) => 0x58
-* INC (nn) => 0x59
+* INC rr => 0x57                - DONE
+* INC (rr) => 0x58              - DONE
+* INC (nn) => 0x59              - DONE
 * INCP rrrr => 0x5A
 * INCP (rr) => 0x5B
 * INCP (nn) => 0x5C
 
 ##### DEC:
-* DEC rr => 0x5D
-* DEC (rr) => 0x5E
-* DEC (nn) => 0x5F
+* DEC rr => 0x5D                - DONE
+* DEC (rr) => 0x5E              - DONE
+* DEC (nn) => 0x5F              - DONE
 * DECP rrrr => 0x60
 * DECP (rr) => 0x61
 * DECP (nn) => 0x62
